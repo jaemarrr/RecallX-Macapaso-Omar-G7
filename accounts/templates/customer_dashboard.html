@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Customer Dashboard - RecallX</title></head>
+<body>
+    <h2>Customer Dashboard</h2>
+    <p>Welcome, <b>{{ request.user.username }}</b> (Customer Role)</p>
+    <a href="{% url 'profile' %}">Edit Profile</a> | 
+    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+</body>
+</html>
