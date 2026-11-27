@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="card"><h2>My profile</h2>
+<div class="row">{% if user.profile.avatar %}<img class="avatar" src="{{ user.profile.avatar.url }}" alt="Avatar">{% endif %}
+<div><strong>{{ user.get_full_name }}</strong><br>@{{ user.username }} &middot; {{ user.profile.get_role_display }}</div></div></div>
+<div class="card"><h3>Update details</h3>
+<form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+{% for f in user_form %}<div class="field"><label>{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+{% for f in profile_form %}<div class="field"><label>{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+<button class="btn" type="submit">Save changes</button></form></div>
+{% endblock %}

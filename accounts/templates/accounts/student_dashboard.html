@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block title %}My Dashboard{% endblock %}
+{% block content %}
+<div class="row" style="justify-content:space-between"><h2>Welcome, {{ user.first_name }}</h2><a class="btn" href="{% url 'deck_create' %}">+ New deck</a></div>
+<div class="card"><span class="stat">{{ total_due }}</span> <span class="muted">card{{ total_due|pluralize }} due for review today</span></div>
+<h3>My decks</h3>
+<div class="grid">
+{% for d in decks %}
+<div class="card"><h4><a href="{% url 'deck_detail' d.pk %}">{{ d.title }}</a></h4>
+<p class="muted">{{ d.subject|default:"No subject" }} &middot; {{ d.total }} card{{ d.total|pluralize }} &middot; {{ d.due }} due</p>
+<form method="post" action="{% url 'study_start' d.pk %}">{% csrf_token %}<button class="btn good" type="submit">Study</button></form></div>
+{% empty %}<div class="card">No decks yet. <a href="{% url 'deck_create' %}">Create your first deck</a>.</div>{% endfor %}
+</div>
+<h3>Recent study sessions</h3>
+<div class="card"><table><tr><th>Deck</th><th>Date</th><th>Score</th><th></th></tr>
+{% for s in sessions %}<tr><td>{{ s.deck.title }}</td><td>{{ s.started_at|date:"M d, H:i" }}</td><td>{% if s.completed_at %}{{ s.correct }}/{{ s.total }} ({{ s.score_percent }}%){% else %}In progress{% endif %}</td>
+<td>{% if s.completed_at %}<a href="{% url 'study_summary' s.pk %}">View</a>{% else %}<a href="{% url 'study_session' s.pk %}">Resume</a>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="4" class="muted">No sessions yet.</td></tr>{% endfor %}</table></div>
+{% endblock %}
