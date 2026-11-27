@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block title %}Login{% endblock %}
+{% block content %}
+<div class="card"><h2>Log in</h2>
+<form method="post" novalidate>{% csrf_token %}
+{% if form.errors %}<div class="msg error">Invalid username or password. Please try again.</div>{% endif %}
+<div class="field"><label>Username</label>{{ form.username }}</div>
+<div class="field"><label>Password</label>{{ form.password }}</div>
+<input type="hidden" name="next" value="{{ next }}">
+<button class="btn" type="submit">Login</button> <a href="{% url 'register' %}">Create an account</a>
+</form></div>
+{% endblock %}

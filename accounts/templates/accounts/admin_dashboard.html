@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h2>Admin dashboard</h2>
+<div class="grid">
+<div class="card"><div class="stat">{{ user_count }}</div>Users</div>
+<div class="card"><div class="stat">{{ deck_count }}</div>Decks</div>
+<div class="card"><div class="stat">{{ card_count }}</div>Flashcards</div>
+<div class="card"><div class="stat">{{ session_count }}</div>Study sessions</div>
+</div>
+<h3>All decks</h3>
+<div class="card"><table><tr><th>Deck</th><th>Owner</th><th>Cards</th><th>Updated</th><th></th></tr>
+{% for d in decks %}<tr><td><a href="{% url 'deck_detail' d.pk %}">{{ d.title }}</a></td><td>{{ d.owner.username }}</td><td>{{ d.total }}</td><td>{{ d.updated_at|date:"M d, Y" }}</td>
+<td><a class="btn danger" href="{% url 'deck_delete' d.pk %}">Delete</a></td></tr>
+{% empty %}<tr><td colspan="5" class="muted">No decks yet.</td></tr>{% endfor %}</table></div>
+{% endblock %}
