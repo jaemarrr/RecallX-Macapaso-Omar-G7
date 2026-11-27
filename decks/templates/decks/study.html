@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% block title %}Study: {{ session.deck.title }}{% endblock %}
+{% block content %}
+<h2>{{ session.deck.title }}</h2>
+<p class="muted">Card {{ done|add:1 }} of {{ total }}</p>
+<div class="progress"><div style="width:{% widthratio done total 100 %}%"></div></div><br>
+<div class="card flash"><strong>{{ answer.card.question|linebreaksbr }}</strong>
+{% if answer.card.hint and not reveal %}<p class="muted"><small>Hint: {{ answer.card.hint }}</small></p>{% endif %}
+{% if reveal %}<hr><div>{{ answer.card.answer|linebreaksbr }}</div>{% endif %}</div>
+{% if reveal %}
+<form method="post" action="{% url 'study_answer' session.pk %}" class="row">{% csrf_token %}
+<button class="btn good" name="result" value="correct" type="submit">I got it</button>
+<button class="btn danger" name="result" value="wrong" type="submit">I missed it</button></form>
+{% else %}<a class="btn" href="?reveal=1">Show answer</a>{% endif %}
+{% endblock %}

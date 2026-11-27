@@ -1,11 +1,98 @@
-{% extends 'base.html' %}{% block title %}Login{% endblock %}
+{% extends 'base.html' %}{% block title %}Log in{% endblock %}
 {% block content %}
-<div class="card"><h2>Log in</h2>
-<form method="post" novalidate>{% csrf_token %}
-{% if form.errors %}<div class="msg error">Invalid username or password. Please try again.</div>{% endif %}
-<div class="field"><label>Username</label>{{ form.username }}</div>
-<div class="field"><label>Password</label>{{ form.password }}</div>
-<input type="hidden" name="next" value="{{ next }}">
-<button class="btn" type="submit">Login</button> <a href="{% url 'register' %}">Create an account</a>
-</form></div>
+<style>
+body{background:#d9dee7}nav{display:none}main{max-width:1000px;margin:3rem auto}
+.lg{display:grid;grid-template-columns:1fr 1fr;min-height:540px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 50px #1e293b26}
+.lg-form{padding:3rem 3.5rem;display:flex;flex-direction:column;justify-content:center}
+.logo{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:1.4rem;color:#4f46e5;margin-bottom:1.8rem}
+.logo svg{width:34px;height:34px}
+.lg-form h2{margin:0 0 .3rem;font-size:1.6rem;color:#0f1d3d}.lg-form .sub{color:#64748b;font-size:.9rem;margin:0 0 1.5rem}
+.inp{position:relative;margin-bottom:.9rem}
+.inp input{padding:.8rem 2.6rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:.92rem;transition:border-color .2s,box-shadow .2s,background .2s}
+.inp input:focus{outline:0;background:#fff;border-color:#4f46e5;box-shadow:0 0 0 4px #4f46e51f}
+.inp .ico{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#94a3b8;pointer-events:none;transition:color .2s}
+.inp:focus-within .ico{color:#4f46e5}
+.eye{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;color:#94a3b8;padding:.2rem;width:auto;display:flex}
+.eye:hover{color:#4f46e5}.eye svg{width:20px;height:20px}
+.opts{display:flex;align-items:center;margin:.2rem 0 1.3rem;font-size:.85rem;color:#64748b}
+.opts label{display:flex;align-items:center;gap:.5rem;cursor:pointer}.opts input{width:16px;height:16px;accent-color:#4f46e5}
+.caps{display:none;color:#b45309;font-size:.82rem;margin:-.3rem 0 .8rem}
+.lg-btn{width:100%;padding:.85rem;border:0;border-radius:8px;background:#4f46e5;color:#fff;font-weight:600;font-size:.95rem;cursor:pointer;transition:background .2s,transform .1s,box-shadow .2s}
+.lg-btn:hover{background:#4338ca;box-shadow:0 6px 14px #4f46e54d;transform:translateY(-1px)}.lg-btn[disabled]{opacity:.75;cursor:wait}
+.lg-foot{text-align:center;margin-top:1.6rem;font-size:.88rem;color:#64748b}.lg-foot a{color:#4f46e5;text-decoration:none;font-weight:600}.lg-foot a:hover{text-decoration:underline}
+.lg-err{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:.65rem .9rem;border-radius:8px;font-size:.88rem;margin-bottom:1rem}
+.shake{animation:shake .4s}@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.lg-art{background:linear-gradient(135deg,#4f46e5,#7c3aed 60%,#a855f7);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden}
+.lg-art svg.scene{width:100%;max-width:380px}
+.float{animation:float 4s ease-in-out infinite}.f2{animation-delay:-1.3s}.f3{animation-delay:-2.6s}
+@keyframes float{50%{transform:translateY(-8px)}}
+.slides{text-align:center;min-height:90px;margin-top:1rem;position:relative;width:100%}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .5s}.slide.on{opacity:1}
+.slide h3{margin:0 0 .4rem;font-size:1.25rem}.slide p{margin:0;opacity:.85;font-size:.9rem}
+.dots{display:flex;gap:.5rem;margin-top:.8rem}.dots button{width:8px;height:8px;border-radius:50%;border:0;background:#fff6;cursor:pointer;padding:0;transition:all .2s}
+.dots button.on{background:#fff;width:22px;border-radius:99px}
+@media(max-width:800px){.lg{grid-template-columns:1fr}.lg-art{display:none}.lg-form{padding:2rem 1.5rem}}
+</style>
+<div class="lg">
+  <div class="lg-form">
+    <div class="logo">
+      <svg viewBox="0 0 40 40" fill="none"><rect x="6" y="9" width="24" height="26" rx="5" fill="#f59e0b"/><rect x="10" y="4" width="24" height="26" rx="5" fill="#4f46e5"/><path d="M17 17l5 5 8-9" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      RecallX
+    </div>
+    <h2>Log in to your Account</h2>
+    <p class="sub">Welcome back! Enter your details to continue studying.</p>
+    {% if form.errors %}<div class="lg-err shake">Invalid username or password. Please try again.</div>{% endif %}
+    <form method="post" id="loginForm" novalidate>{% csrf_token %}
+      <div class="inp">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        <input type="text" name="username" id="id_username" placeholder="Username" aria-label="Username" value="{{ form.username.value|default:'' }}" autocomplete="username" autofocus required>
+      </div>
+      <div class="inp">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+        <input type="password" name="password" id="id_password" placeholder="Password" aria-label="Password" autocomplete="current-password" required>
+        <button type="button" class="eye" id="togglePw" aria-label="Show password">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path id="eyeOpen" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle id="eyePupil" cx="12" cy="12" r="3"/><path id="eyeSlash" d="M3 3l18 18" style="display:none"/></svg>
+        </button>
+      </div>
+      <div class="caps" id="caps">&#9888; Caps Lock is on</div>
+      <div class="opts"><label><input type="checkbox" name="remember" value="1"> Remember me</label></div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="lg-btn" type="submit" id="loginBtn">Log in</button>
+    </form>
+    <p class="lg-foot">Don't have an account? <a href="{% url 'register' %}">Create an account</a></p>
+  </div>
+  <div class="lg-art">
+    <svg class="scene" viewBox="0 0 400 300" fill="none">
+      <circle cx="200" cy="150" r="135" fill="#fff" fill-opacity=".08"/><circle cx="200" cy="150" r="100" fill="#fff" fill-opacity=".07"/>
+      <path d="M95 105h50v90h-50M145 150h60" stroke="#fff" stroke-opacity=".25" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+      <g class="float"><circle cx="95" cy="105" r="30" fill="#fff"/><text x="95" y="116" font-size="30" font-weight="700" text-anchor="middle" fill="#4f46e5">?</text></g>
+      <g class="float f2"><circle cx="70" cy="150" r="26" fill="#fff"/><path d="M58 150l8 8 15-17" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+      <g class="float f3"><circle cx="95" cy="195" r="30" fill="#fff"/><path d="M95 178l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#f59e0b"/></g>
+      <g class="float f2"><rect x="195" y="90" width="150" height="130" rx="10" fill="#fff"/>
+        <circle cx="210" cy="104" r="4" fill="#ef4444"/><circle cx="222" cy="104" r="4" fill="#f59e0b"/><circle cx="234" cy="104" r="4" fill="#22c55e"/>
+        <rect x="205" y="120" width="130" height="28" rx="6" fill="#eef2ff"/><rect x="214" y="128" width="70" height="5" rx="2.5" fill="#a5b4fc"/><rect x="214" y="137" width="45" height="4" rx="2" fill="#c7d2fe"/>
+        <rect x="205" y="154" width="130" height="28" rx="6" fill="#eef2ff"/><rect x="214" y="162" width="85" height="5" rx="2.5" fill="#a5b4fc"/><rect x="214" y="171" width="55" height="4" rx="2" fill="#c7d2fe"/>
+        <rect x="205" y="188" width="130" height="24" rx="6" fill="#dcfce7"/><rect x="214" y="197" width="60" height="5" rx="2.5" fill="#86efac"/></g>
+    </svg>
+    <div class="slides" id="slides">
+      <div class="slide on"><h3>Test yourself, remember more</h3><p>Active recall beats rereading every time.</p></div>
+      <div class="slide"><h3>Reviews that adapt to you</h3><p>Cards you miss come back sooner, cards you know come back later.</p></div>
+      <div class="slide"><h3>Track every session</h3><p>See your score after each study round.</p></div>
+    </div>
+    <div class="dots" id="dots"><button class="on" aria-label="Slide 1"></button><button aria-label="Slide 2"></button><button aria-label="Slide 3"></button></div>
+  </div>
+</div>
+<script>
+const pw=document.getElementById('id_password'),usr=document.getElementById('id_username'),btn=document.getElementById('loginBtn');
+document.getElementById('togglePw').addEventListener('click',()=>{const show=pw.type==='password';pw.type=show?'text':'password';
+  document.getElementById('eyeSlash').style.display=show?'':'none';});
+pw.addEventListener('keyup',e=>{document.getElementById('caps').style.display=e.getModifierState&&e.getModifierState('CapsLock')?'block':'none';});
+document.getElementById('loginForm').addEventListener('submit',e=>{
+  if(!usr.value.trim()||!pw.value){e.preventDefault();(usr.value.trim()?pw:usr).focus();btn.classList.add('shake');setTimeout(()=>btn.classList.remove('shake'),400);return;}
+  btn.disabled=true;btn.textContent='Logging in...';});
+const slides=[...document.querySelectorAll('.slide')],dots=[...document.querySelectorAll('#dots button')];let cur=0,timer;
+function show(i){cur=i;slides.forEach((s,k)=>s.classList.toggle('on',k===i));dots.forEach((d,k)=>d.classList.toggle('on',k===i));}
+function auto(){clearInterval(timer);timer=setInterval(()=>show((cur+1)%slides.length),4000);}
+dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);auto();}));auto();
+</script>
 {% endblock %}

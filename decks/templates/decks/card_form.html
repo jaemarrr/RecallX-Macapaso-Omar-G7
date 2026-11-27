@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<div class="card"><h2>{{ heading }} <span class="muted">&middot; {{ deck.title }}</span></h2>
+<form method="post" novalidate>{% csrf_token %}{{ form.non_field_errors }}
+{% for f in form %}<div class="field"><label>{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+<button class="btn" type="submit">Save</button>
+{% if not form.instance.pk %}<button class="btn good" type="submit" name="save_another" value="1">Save &amp; add another</button>{% endif %}
+<a class="btn secondary" href="{% url 'deck_detail' deck.pk %}">Cancel</a></form></div>
+{% endblock %}

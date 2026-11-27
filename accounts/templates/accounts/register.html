@@ -1,9 +1,39 @@
 {% extends 'base.html' %}{% block title %}Register{% endblock %}
 {% block content %}
-<div class="card"><h2>Create your account</h2>
-<form method="post" novalidate>{% csrf_token %}
-{{ form.non_field_errors }}
-{% for f in form %}<div class="field"><label>{{ f.label }}</label>{{ f }}{{ f.errors }}{% if f.help_text %}<small class="muted">{{ f.help_text|safe }}</small>{% endif %}</div>{% endfor %}
-<button class="btn" type="submit">Register</button> <a href="{% url 'login' %}">Already have an account?</a>
-</form></div>
+<div class="auth">
+  <div class="auth-side">
+    <h1>Join RecallX</h1>
+    <p>Create your free account and start building decks that help you remember what you study.</p>
+    <ul><li>&#10003; Create unlimited flashcard decks</li><li>&#10003; Study with spaced repetition</li><li>&#10003; See your score after every session</li></ul>
+  </div>
+  <div class="auth-form">
+    <h2>Create your account</h2><p class="muted">It only takes a minute.</p>
+    <form method="post" id="regForm" novalidate>{% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for f in form %}
+      <div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>
+        {% if f.name == 'password1' or f.name == 'password2' %}
+        <div class="pwwrap">{{ f }}<button type="button" class="toggle" data-target="{{ f.id_for_label }}">Show</button></div>
+        {% else %}{{ f }}{% endif %}
+        {% if f.name == 'password1' %}<div class="meter"><div id="meterBar"></div></div><div class="hint" id="strengthText"></div>{% endif %}
+        {% if f.name == 'password2' %}<div class="hint" id="matchText"></div>{% endif %}
+        {{ f.errors }}
+        {% if f.help_text and f.name != 'password2' %}<small class="muted">{{ f.help_text|safe }}</small>{% endif %}
+      </div>{% endfor %}
+      <button class="btn btn-block" type="submit" id="regBtn">Create account</button>
+    </form>
+    <p style="text-align:center" class="muted">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.toggle').forEach(b=>b.addEventListener('click',()=>{
+  const i=document.getElementById(b.dataset.target),s=i.type==='password';i.type=s?'text':'password';b.textContent=s?'Hide':'Show';}));
+const p1=document.getElementById('id_password1'),p2=document.getElementById('id_password2'),bar=document.getElementById('meterBar'),st=document.getElementById('strengthText'),mt=document.getElementById('matchText');
+function strength(v){let s=0;if(v.length>=8)s++;if(v.length>=12)s++;if(/[a-z]/.test(v)&&/[A-Z]/.test(v))s++;if(/\d/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;return s;}
+p1.addEventListener('input',()=>{const s=strength(p1.value),L=[['',0,'#e5e7eb'],['Weak',25,'#ef4444'],['Weak',25,'#ef4444'],['Okay',55,'#f59e0b'],['Good',80,'#10b981'],['Strong',100,'#16a34a']][p1.value?s||1:0];
+  bar.style.width=L[1]+'%';bar.style.background=L[2];st.textContent=L[0]?'Strength: '+L[0]:'';st.style.color=L[2];check();});
+function check(){if(!p2.value){mt.textContent='';return;}const ok=p1.value===p2.value;mt.textContent=ok?'\u2713 Passwords match':'Passwords do not match';mt.style.color=ok?'#16a34a':'#dc2626';}
+p2.addEventListener('input',check);
+document.getElementById('regForm').addEventListener('submit',()=>{const b=document.getElementById('regBtn');b.disabled=true;b.textContent='Creating account...';});
+</script>
 {% endblock %}
